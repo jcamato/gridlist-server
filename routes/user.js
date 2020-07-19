@@ -2,7 +2,7 @@ const express = require("express");
 const pool = require("../db");
 const router = express.Router();
 
-//get a specific user
+//get a specific user ?Change to ID and have React assign link to /:userName?
 router.get("/:userName", async (req, res) => {
   try {
     const user = await pool.query(

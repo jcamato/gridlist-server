@@ -10,8 +10,8 @@ const authorize = require("../middleware/authorize");
 // @desc   Register user and return JWT token
 // @access Public
 router.post("/register", validate, async (req, res) => {
-  // 1. destructure the req.body (name, email, password)
-  const { name, email, password } = req.body;
+  // 1. destructure the req.body (username, email, password)
+  const { username, email, password } = req.body;
 
   try {
     // 2. check if user exists (if user exists then throw error)
@@ -33,7 +33,7 @@ router.post("/register", validate, async (req, res) => {
     // 4. enter the new user inside our database
     let newUser = await pool.query(
       "INSERT INTO app_user (user_name, email, password) VALUES ($1, $2, $3) RETURNING user_id",
-      [name, email, bcryptPassword]
+      [username, email, bcryptPassword]
     );
 
     // 5. generate our jwt token

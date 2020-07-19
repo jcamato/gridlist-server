@@ -6,7 +6,9 @@ npm init
 npm install bcryptjs cors dotenv express jsonwebtoken pg
 # nodemon - MDN
 npm install --save-dev nodemon
-# npm install node-fetch igdb-api-node body-parser ?
+npm install node-fetch igdb-api-node
+# body-parser?
+# npm install cron ? for scheduled tasks like backups
 ```
 
 ## List

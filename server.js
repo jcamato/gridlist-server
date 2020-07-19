@@ -12,7 +12,10 @@ app.use("/auth", require("./routes/auth"));
 app.use("/profile", require("./routes/profile"));
 
 app.use("/user", require("./routes/user"));
-app.use("/users", require("./routes/users"));
+// app.use("/users", require("./routes/users"));
+
+app.use("/movies", require("./routes/api/tmdb"));
+app.use("/games", require("./routes/api/igdb"));
 
 app.listen(process.env.PORT, () =>
   console.log(

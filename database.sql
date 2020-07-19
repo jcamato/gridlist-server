@@ -53,7 +53,8 @@ CREATE TABLE library_movie (
   library_category_id     SMALLINT      NOT NULL,
   score                   SMALLINT,
   watch_date              DATE,
-  rewatch_dates           DATE[],
+  -- watch_count             SMALLINT,
+  -- rewatch_dates           DATE[],
   private                 BOOLEAN       NOT NULL  DEFAULT false,
   notes                   TEXT,
 
@@ -80,13 +81,12 @@ CREATE TABLE library_category (
 
 INSERT INTO library_category (library_category_id, name, list_order)
   VALUES
-    (1, 'All',            1),
-    (2, 'Want to Watch',  2),
-    (3, 'Watching',       3),
-    (4, 'Watched',        4),
-    (5, 'Want to Play',   5),
-    (6, 'Playing',        6),
-    (7, 'Played',         7),
+    (1, 'Want to Watch',  1),
+    (2, 'Watching',       2),
+    (3, 'Watched',        3),
+    (4, 'Want to Play',   4),
+    (5, 'Playing',        5),
+    (6, 'Played',         6),
     (98, 'On Hold',        98),
     (99, 'Unfinished',     99);
   
