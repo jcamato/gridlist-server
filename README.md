@@ -8,17 +8,18 @@ npm install bcryptjs cors dotenv express jsonwebtoken pg
 npm install --save-dev nodemon
 npm install node-fetch igdb-api-node
 # body-parser?
-# npm install cron ? for scheduled tasks like backups
+# npm install cron ? for scheduled tasks like caching the APIs or backups
+# redis
 ```
 
 ## List
 
-- [ ] Set up database - MDN
-- [ ] Create user table
-- [ ] Add Login/Register
-- [ ] Create library table
-- [ ] Create user / library routes
-- [ ] Connect Auth to front end
-
+- [x] Set up database
+- [x] Create user table
+- [x] Create library table
+- [x] Create user / library routes
+- [x] Connect auth to client
+- [ ] Redis for caching and to custom fetch multiple IDs for Library
+- [ ] Cron for scheduled tasks
 - [ ] Set up API calls for movies (still need to work on query string)
-- [ ] Set up API calls for video games (still need to work on query string)
+- [x] Set up API calls for video games (still need to work on query string)
