@@ -9,7 +9,7 @@ app.use(express.json());
 
 //routes
 app.use("/auth", require("./routes/auth"));
-app.use("/profile", require("./routes/profile"));
+app.use("/library", require("./routes/library"));
 
 app.use("/user", require("./routes/user"));
 // app.use("/users", require("./routes/users"));
