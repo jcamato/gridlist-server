@@ -4,6 +4,7 @@
 # development
 .env
 /archive
+/development
 
 # misc
 .DS_Store

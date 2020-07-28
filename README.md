@@ -12,14 +12,23 @@ npm install node-fetch igdb-api-node
 # redis
 ```
 
-## List
+## Main Tasks
 
 - [x] Set up database
 - [x] Create user table
 - [x] Create library table
 - [x] Create user / library routes
 - [x] Connect auth to client
-- [ ] Redis for caching and to custom fetch multiple IDs for Library
-- [ ] Cron for scheduled tasks
-- [ ] Set up API calls for movies (still need to work on query string)
-- [x] Set up API calls for video games (still need to work on query string)
+- [ ] Redis for caching and to custom fetch multiple IDs for Library. letterboxd seems to cache entire TMDb library every 30 hours??
+- [ ] Cron for scheduled tasks, like above?
+- [ ] Work on query generator for filters
+
+- [ ] Restructure API calls for movies, wait until cache figured out
+- [ ] Restructure API calls for video games, wait until cache figured out
+
+## Notes
+
+PostgreSQL movie shell, can attach my own fields such as gridlist score, reviews, etc.
+Use TMDB to fill some cache of the main information, append to response
+
+Then have middleware and queries for sorting and accessing the data here.

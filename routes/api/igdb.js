@@ -16,6 +16,36 @@ router.get("/", (req, res) => {
 
   const APP_KEY = process.env.IGDB_KEY;
 
+  let filters = [
+    {
+      label: "Genre",
+      query: "&with_genres",
+      defaultValue: [],
+      currentValue: [],
+      prepareValueForQuery: (value) => {
+        return value;
+      },
+    },
+    {
+      label: "Release LTE",
+      query: "&primary_release_date.lte",
+      defaultValue: 2021,
+      currentValue: 2021,
+      prepareValueForQuery: (value) => {
+        return `${value}-12-31`;
+      },
+    },
+    {
+      label: "Runtime GTE",
+      query: "&with_runtime.gte",
+      defaultValue: 0,
+      currentValue: 0,
+      prepareValueForQuery: (value) => {
+        return value;
+      },
+    },
+  ];
+
   const getGames = async () => {
     try {
       // const where = 'release_dates.platform = (6)'
@@ -24,6 +54,18 @@ router.get("/", (req, res) => {
         .fields(
           "id, name, rating, rating_count, popularity, cover.url, summary, release_dates.y, category"
         )
+        // array of strings works too
+        // .fields([
+        //   "id",
+        //   "name",
+        //   "rating",
+        //   "rating_count",
+        //   "popularity",
+        //   "cover.url",
+        //   "summary",
+        //   "release_dates.y",
+        //   "category",
+        // ])
         .limit(20)
         // .offset(20) // offset results by 20
         .sort("rating", "desc")

@@ -17,6 +17,9 @@ app.use("/user", require("./routes/user"));
 app.use("/movies", require("./routes/api/tmdb"));
 app.use("/games", require("./routes/api/igdb"));
 
+// test environment, not for production
+app.use("/test", require("./routes/test"));
+
 app.listen(process.env.PORT, () =>
   console.log(
     `Server started on port ${process.env.PORT}. See http://localhost:${process.env.PORT}/`
