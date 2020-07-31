@@ -1,17 +1,19 @@
-const router = require("express").Router();
-const authorize = require("../middleware/authorize");
+const express = require("express");
 const pool = require("../db");
+const router = express.Router();
+const authorize = require("../middleware/authorize");
+const checkMovieStorage = require("../middleware/checkMovieStorage");
 
 //get all library movie items from authenticated user
 router.get("/movie", authorize, async (req, res) => {
   try {
     // console.log(req.user);
-    const user = await pool.query(
-      "SELECT lm.library_movie_id, lm.tmdb_id, lm.library_category_id, lm.score, lm.watch_date FROM app_user AS u LEFT JOIN library_movie AS lm ON u.user_id = lm.user_id WHERE u.user_id = $1",
+    const library = await pool.query(
+      "SELECT lm.library_movie_id, lm.tmdb_id, lm.library_category_id, lm.score, lm.watch_date, tm.original_title, tm.poster_path FROM app_user AS u INNER JOIN library_movie AS lm ON u.user_id = lm.user_id LEFT JOIN tmdb_movie AS tm ON lm.tmdb_id = tm.id WHERE u.user_id = $1",
       [req.user.id]
     );
 
-    res.json(user.rows);
+    res.json(library.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -19,7 +21,7 @@ router.get("/movie", authorize, async (req, res) => {
 });
 
 //create a library movie item
-router.post("/movie", authorize, async (req, res) => {
+router.post("/movie", authorize, checkMovieStorage, async (req, res) => {
   try {
     const { tmdb_id, library_category_id, score, watch_date } = req.body;
 

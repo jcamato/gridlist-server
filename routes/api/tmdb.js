@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/movies/discover", (req, res) => {
   console.log("Trying to fetch TMDB...");
 
   // res.send("respond with a resource");
