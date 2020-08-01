@@ -9,7 +9,7 @@ router.get("/movie", authorize, async (req, res) => {
   try {
     // console.log(req.user);
     const library = await pool.query(
-      "SELECT lm.library_movie_id, lm.tmdb_id, lm.library_category_id, lm.score, lm.watch_date, tm.original_title, tm.poster_path FROM app_user AS u INNER JOIN library_movie AS lm ON u.user_id = lm.user_id LEFT JOIN tmdb_movie AS tm ON lm.tmdb_id = tm.id WHERE u.user_id = $1",
+      "SELECT lm.library_movie_id, lm.tmdb_id, lm.library_category_id, lm.score, lm.watch_date, tm.title, tm.poster_path, tm.vote_average, tm.release_date, tm.overview, tm.backdrop_path FROM app_user AS u INNER JOIN library_movie AS lm ON u.user_id = lm.user_id LEFT JOIN tmdb_movie AS tm ON lm.tmdb_id = tm.id WHERE u.user_id = $1",
       [req.user.id]
     );
 
