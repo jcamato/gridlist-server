@@ -82,6 +82,8 @@ router.post("/movie", authorize, checkMovieStorage, async (req, res) => {
 //   }
 // });
 
+// .put overwrites the whole resource
+
 // update library movie item depending on which parameters are sent.
 // However, this is technically functioning as a put since it's updating all the fields
 router.patch("/movie/:id", authorize, async (req, res) => {
