@@ -2,12 +2,14 @@ const pool = require("../db");
 const fetch = require("node-fetch");
 
 // This middleware will check local storage for the existence of a movie and its related tables (videos, images, credits)
-// If this movie does not exist in all 4 tables, it will fetch the data from TMDB and store this locally for access
+// If this movie does not exist in any of the 4 tables, it will fetch the data from TMDB and store this locally for access
 
 module.exports = async function (req, res, next) {
   try {
     // These will be supplied with either req.params or req.body based on movie details request or library addition
-    const id = req.params.id ?? req.body.tmdb_id;
+    // update node for nullish operator
+    // const id = req.params.id ?? req.body.tmdb_id;
+    const id = req.params.id ? req.params.id : req.body.tmdb_id;
 
     // console.log(req.params);
     // console.log(req.params.id);
@@ -40,12 +42,12 @@ module.exports = async function (req, res, next) {
       const APP_KEY = process.env.TMDB_KEY;
 
       const fetchMovieAndStore = async () => {
+        console.log("All Movie tables are not stored, fetching...");
         const response = await fetch(
           `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}&append_to_response=videos,images,credits`
         );
         const movie = await response.json();
         // res.json(movie);
-        console.log("All Movie tables are not stored, fetching ...");
 
         // console.log(movie.genres);
         // console.log(JSON.stringify(movie.genres));

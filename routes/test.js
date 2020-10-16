@@ -4,6 +4,7 @@ const router = express.Router();
 // const generateQueryString = require("../utils/generateQueryString");
 const _ = require("lodash");
 
+// Query String Encoder
 router.get("/", (req, res) => {
   let defaultFilters = [
     {
@@ -25,7 +26,7 @@ router.get("/", (req, res) => {
       type: "range",
       display: "Release Year",
       defaultValue: [1878, new Date().getFullYear() + 7],
-      currentValue: [1991, 2009],
+      currentValue: [1878, 1999],
     },
     {
       name: "genre",
@@ -64,12 +65,13 @@ router.get("/", (req, res) => {
       // code to only return bounds that changed
       // let nextLower = "";
       // let nextUpper = "";
-      // if (value.currentValue.gte !== value.defaultValue.gte) {
-      //   nextLower = value.currentValue.gte;
+      // if (filter.currentValue[0] !== filter.defaultValue[0]) {
+      //   nextLower = filter.currentValue[0];
       // }
-      // if (value.currentValue.lte !== value.defaultValue.lte) {
-      //   nextUpper = value.currentValue.lte;
+      // if (filter.currentValue[1] !== filter.defaultValue[1]) {
+      //   nextUpper = filter.currentValue[1];
       // }
+      // queries.push(`${filter.name}=${nextLower}..${nextUpper}`);
 
       // otherwise, can just return both bounds always?
       queries.push(
