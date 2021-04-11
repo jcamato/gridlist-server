@@ -14,7 +14,8 @@ router.get("/", (req, res) => {
   // console.log("req.originaUrl: " + req.originalUrl); // /games?include_adult=false&vote_count.gte=200&sort_by=popularity
   // console.log("req.body: " + req.body); // undefined
 
-  const APP_KEY = process.env.IGDB_KEY;
+  const CLIENT_ID = process.env.IGDB_CLIENT_ID;
+  const APP_TOKEN = process.env.IGDB_APP_TOKEN;
 
   let filters = [
     {
@@ -50,9 +51,9 @@ router.get("/", (req, res) => {
     try {
       // const where = 'release_dates.platform = (6)'
       const where = "rating > 0 & rating_count >= 200 & category = 0";
-      const response = await igdb(APP_KEY)
+      const response = await igdb(CLIENT_ID, APP_TOKEN)
         .fields(
-          "id, name, rating, rating_count, popularity, cover.url, summary, release_dates.y, category"
+          "id, name, rating, rating_count, cover.url, summary, release_dates.y, category"
         )
         // array of strings works too
         // .fields([
