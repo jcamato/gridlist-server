@@ -1,5 +1,5 @@
 CREATE TABLE tmdb_movie_videos (
--- tmdb fields
+-- tmdb movie get videos fields
 id            INTEGER NOT NULL UNIQUE,
 results       JSON NOT NULL,
 -- custom fields

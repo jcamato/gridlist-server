@@ -1,5 +1,5 @@
 CREATE TABLE tmdb_movie_images (
--- tmdb fields
+-- tmdb movie get images fields
 id            INTEGER NOT NULL UNIQUE,
 backdrops     JSON NOT NULL,
 posters       JSON NOT NULL,

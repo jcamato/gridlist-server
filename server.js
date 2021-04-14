@@ -15,11 +15,12 @@ app.use("/user", require("./routes/user"));
 // app.use("/users", require("./routes/users"));
 
 // Discover Pages?
-app.use("/movies", require("./routes/api/tmdb"));
+// app.use("/movies", require("./routes/api/tmdb"));
 app.use("/games", require("./routes/api/igdb"));
 
 // Detail Pages?
 app.use("/movie", require("./routes/movie"));
+app.use("/game", require("./routes/game"));
 
 // test environment, not for production
 app.use("/test", require("./routes/test"));

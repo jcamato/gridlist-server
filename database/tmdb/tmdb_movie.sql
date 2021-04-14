@@ -1,10 +1,10 @@
 CREATE TABLE tmdb_movie (
--- tmdb fields
+-- tmdb movie get details fields
 adult                     BOOLEAN NOT NULL,
 backdrop_path             TEXT,
 belongs_to_collection     JSON, -- how to handle this object?
 budget                    BIGINT NOT NULL,
-genres                    JSON NOT NULL, -- this could just be array of genre INTEGERs
+genres                    JSON NOT NULL, -- this could just be array of genre INTEGERs?
 homepage                  TEXT,
 id                        INTEGER NOT NULL UNIQUE,
 imdb_id                   TEXT,

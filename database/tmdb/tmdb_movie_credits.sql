@@ -1,5 +1,5 @@
 CREATE TABLE tmdb_movie_credits (
--- tmdb fields
+-- tmdb movie get credits fields
 id            INTEGER NOT NULL UNIQUE,
 cast_list     JSON NOT NULL, -- cast is reserved
 crew          JSON NOT NULL,
