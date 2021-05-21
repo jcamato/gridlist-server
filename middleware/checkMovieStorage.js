@@ -9,8 +9,8 @@ module.exports = async function (req, res, next) {
   try {
     // These will be supplied with either req.params or req.body based on movie details request or library addition
     // update node for nullish operator
-    // const id = req.params.id ?? req.body.tmdb_id;
-    const id = req.params.id ? req.params.id : req.body.tmdb_id;
+    // const id = req.params.id ?? req.body.tmdb_movie_id;
+    const id = req.params.id ? req.params.id : req.body.tmdb_movie_id;
 
     // console.log(req.params);
     // console.log(req.params.id);
@@ -19,7 +19,7 @@ module.exports = async function (req, res, next) {
     // console.log(req.body.id);
 
     const stored_movie_appended = await pool.query(
-      "SELECT m.id, m.title FROM tmdb_movie AS m INNER JOIN tmdb_movie_videos AS v ON m.id = v.id INNER JOIN tmdb_movie_images AS i ON m.id = i.id INNER JOIN tmdb_movie_credits AS c ON m.id = c.id WHERE m.id = $1",
+      "SELECT m.id, m.title FROM tmdb_movie AS m INNER JOIN tmdb_movie_videos AS v ON m.id = v.id INNER JOIN tmdb_movie_images AS i ON m.id = i.id INNER JOIN tmdb_movie_credits AS c ON m.id = c.id INNER JOIN tmdb_movie_keywords AS k ON m.id = k.id WHERE m.id = $1",
       [id]
     );
 
@@ -45,7 +45,7 @@ module.exports = async function (req, res, next) {
       const fetchMovieAndStore = async () => {
         console.log("Not all movie tables are stored, fetching...");
         const response = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}&append_to_response=videos,images,credits`
+          `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}&append_to_response=videos,images,credits,keywords`
         );
         const movie = await response.json();
         // res.json(movie);
@@ -122,6 +122,20 @@ module.exports = async function (req, res, next) {
             JSON.stringify(movie.credits.crew),
           ];
           await pool.query(text_tmdb_movie_credits, values_tmdb_movie_credits);
+        }
+
+        if (movie.keywords.keywords) {
+          const text_tmdb_movie_keywords =
+            "INSERT INTO tmdb_movie_keywords(id, keywords) VALUES($1, $2) ON CONFLICT ON CONSTRAINT tmdb_movie_keywords_pkey DO NOTHING RETURNING *";
+
+          const values_tmdb_movie_keywords = [
+            movie.id,
+            JSON.stringify(movie.keywords.keywords),
+          ];
+          await pool.query(
+            text_tmdb_movie_keywords,
+            values_tmdb_movie_keywords
+          );
         }
 
         console.log("Stored.");

@@ -34,17 +34,3 @@ DROP TABLE name_here;
 
 -- delete row
 delete from app_user where user_name = 'jacob';
-  
--- create item movie, gridlist entry to store gridlist score, reviews, etc.
--- CREATE TABLE movie (
---   movie_id                SERIAL,
-
---   tmdb_id                 INTEGER       NOT NULL,     -- to link for TMDB specific data
---   score                   SMALLINT,
---   popularity              SMALLINT,
-
---   created_at              TIMESTAMPTZ   NOT NULL  DEFAULT CURRENT_TIMESTAMP, 
---   updated_at              TIMESTAMPTZ   NOT NULL  DEFAULT CURRENT_TIMESTAMP,
-
---   PRIMARY KEY (movie_id),
--- );
