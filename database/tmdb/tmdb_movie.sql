@@ -15,11 +15,11 @@ popularity                DECIMAL NOT NULL,
 poster_path               TEXT,
 production_companies      JSON NOT NULL, -- how to handle this object?
 production_countries      JSON NOT NULL, -- how to handle this object?
-release_date              TEXT NOT NULL,
+release_date              TEXT NOT NULL, -- FIX: format: date?
 revenue                   BIGINT NOT NULL,
 runtime                   INTEGER,
 spoken_languages          JSON NOT NULL, -- how to handle this object?
-status                    TEXT NOT NULL,
+status                    TEXT NOT NULL, -- allowed values: Rumored, Planned, In Production, Post Production, Released, Cancelled
 tagline                   TEXT,
 title                     TEXT NOT NULL,
 video                     BOOLEAN NOT NULL,
