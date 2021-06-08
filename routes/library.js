@@ -52,15 +52,16 @@ router.post("/movie", authorize, checkMovieStorage, async (req, res) => {
     console.log(req.body);
 
     // check if movie exists, throw err if it does
-    const entry = await pool.query(
+    const currentEntry = await pool.query(
       "SELECT tmdb_movie_id FROM library_movie WHERE user_id = $1 AND tmdb_movie_id = $2",
       [req.user.id, tmdb_movie_id]
     );
 
-    if (entry.rows.length > 0) {
+    if (currentEntry.rows.length > 0) {
       // return res.status(401).json("That movie is already in your library... updating.");
       console.log("Updating existing movie in your library...");
 
+      // FIX: depending on what user sends, compare with currentEntry and update from req.body accordingly
       const updatedMovie = await pool.query(
         "UPDATE library_movie SET library_category_id = $3, score = $4, watch_date = $5, watch_count = $6, private = $7 WHERE user_id = $1 AND tmdb_movie_id = $2 RETURNING *",
         [

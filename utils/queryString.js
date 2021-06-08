@@ -9,10 +9,12 @@ let filterConfig = {
   release: {
     tmdb_name: "release_date",
     defaultValue: [1896, new Date().getFullYear() + 1],
+    value: null,
   },
   genre: {
     tmdb_name: "genres",
     defaultValue: null,
+    value: null,
   },
   runtime: {
     tmdb_name: "runtime",
@@ -45,26 +47,35 @@ let sortConfig = {
   },
 };
 
+// URL
+// http://localhost:5000/movies?sort=score&score=60..90&release=1980..2021&genre=action,adventure
+
 // receive
 let request = {
   sort: "score",
   score: "60..90",
-  genre: "action,adventure",
   release: "1980..2021",
+  genre: "action,adventure",
 };
 
 // format
 let next = {
   sort: "score",
   score: [60, 90],
-  genre: [28, 12],
   release: ["1980-01-01", "2021-12-31"],
+  genre: [28, 12],
 };
 
 // generate
-("SELECT * from tmdb_movie");
-("WHERE vote_average BETWEEN 60 AND 90");
-("AND genre contains [28, 12]");
-("AND release_date BETWEEN '1980-01-01' AND '2021-12-31'");
-("ORDER BY vote_average DESC, vote_count DESC");
-("LIMIT 20");
+const movies = await pool.query(
+  [
+    "SELECT *",
+    "FROM tmdb_movie",
+    "WHERE vote_average BETWEEN 60 AND 90",
+    "AND release_date BETWEEN '2000-01-01' AND '2009-12-31'",
+    "AND genre contains etc.",
+    "ORDER BY vote_average DESC, vote_count DESC",
+    "LIMIT 20",
+  ].join(" ")
+  // , [id]
+);

@@ -4,7 +4,15 @@ const fetch = require("node-fetch");
 module.exports = async function (id) {
   try {
     const stored_movie_appended = await pool.query(
-      "SELECT m.id, m.title FROM tmdb_movie AS m INNER JOIN tmdb_movie_videos AS v ON m.id = v.id INNER JOIN tmdb_movie_images AS i ON m.id = i.id INNER JOIN tmdb_movie_credits AS c ON m.id = c.id INNER JOIN tmdb_movie_keywords AS k ON m.id = k.id WHERE m.id = $1",
+      [
+        "SELECT m.id, m.title",
+        "FROM tmdb_movie AS m",
+        "INNER JOIN tmdb_movie_videos AS v ON m.id = v.id",
+        "INNER JOIN tmdb_movie_images AS i ON m.id = i.id",
+        "INNER JOIN tmdb_movie_credits AS c ON m.id = c.id",
+        "INNER JOIN tmdb_movie_keywords AS k ON m.id = k.id",
+        "WHERE m.id = $1",
+      ].join(" "),
       [id]
     );
 

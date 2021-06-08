@@ -22,6 +22,9 @@ app.use("/games", require("./routes/api/igdb"));
 app.use("/movie", require("./routes/movie"));
 app.use("/game", require("./routes/game"));
 
+// Search results
+app.use("/search", require("./routes/search"));
+
 // Admin
 app.use(
   "/database/tmdb/import_movies",
