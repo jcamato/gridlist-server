@@ -1,6 +1,10 @@
 -- sign into postgresql
 $ psql -U postgres
 
+-- needed this for genres quering
+ALTER system SET jit=off;
+SELECT pg_reload_conf();
+
 -- list databases
 # \l
 
@@ -34,3 +38,7 @@ DROP TABLE name_here;
 
 -- delete row
 delete from app_user where user_name = 'jacob';
+
+-- check types
+select column_name, data_type from information_schema.columns
+where table_name = 'tmdb_movie';

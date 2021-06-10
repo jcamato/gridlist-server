@@ -99,6 +99,11 @@ router.get("/", async (req, res) => {
       console.log(filterParts);
     };
 
+    // SELECT id, title, genres
+    // FROM tmdb_movie
+    // CROSS JOIN lateral jsonb_array_elements(genres) id(ele)
+    // WHERE (ele->>'id')::jsonb @> '28';
+
     parseSliderRangeFilter("score", "vote_average", 0, 100);
     parseSliderRangeFilter(
       "release",

@@ -31,3 +31,9 @@ updated_at                TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 PRIMARY KEY (id)
 );
+
+-- changed genres to jsonb for quering
+ALTER TABLE tmdb_movie
+ALTER COLUMN genres
+TYPE jsonb 
+USING genres::jsonb;
