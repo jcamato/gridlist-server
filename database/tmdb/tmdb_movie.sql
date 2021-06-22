@@ -2,9 +2,9 @@ CREATE TABLE tmdb_movie (
 -- tmdb movie get details fields
 adult                     BOOLEAN NOT NULL,
 backdrop_path             TEXT,
-belongs_to_collection     JSON, -- how to handle this object?
+belongs_to_collection     JSON, -- separate table?
 budget                    BIGINT NOT NULL,
-genres                    JSON NOT NULL, -- this could just be array of genre INTEGERs?
+genres                    JSON NOT NULL, -- separate table?
 homepage                  TEXT,
 id                        INTEGER NOT NULL UNIQUE,
 imdb_id                   TEXT,
@@ -13,12 +13,12 @@ original_title            TEXT NOT NULL,
 overview                  TEXT,
 popularity                DECIMAL NOT NULL,
 poster_path               TEXT,
-production_companies      JSON NOT NULL, -- how to handle this object?
-production_countries      JSON NOT NULL, -- how to handle this object?
+production_companies      JSON NOT NULL, -- separate table?
+production_countries      JSON NOT NULL, -- separate table?
 release_date              TEXT NOT NULL, -- FIX: format: date?
 revenue                   BIGINT NOT NULL,
 runtime                   INTEGER,
-spoken_languages          JSON NOT NULL, -- how to handle this object?
+spoken_languages          JSON NOT NULL,  -- separate table?
 status                    TEXT NOT NULL, -- allowed values: Rumored, Planned, In Production, Post Production, Released, Cancelled
 tagline                   TEXT,
 title                     TEXT NOT NULL,

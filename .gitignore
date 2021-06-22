@@ -5,6 +5,8 @@
 .env
 /archive
 /development
+/database/tmdb/movies.js
+/database/tmdb/people.js
 
 # misc
 .DS_Store

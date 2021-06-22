@@ -30,6 +30,10 @@ app.use(
   "/database/tmdb/import_movies",
   require("./database/tmdb/import_movies")
 );
+app.use(
+  "/database/tmdb/import_people",
+  require("./database/tmdb/import_people")
+);
 
 // test environment, not for production
 app.use("/queryBuilderTest", require("./routes/queryBuilderTest"));

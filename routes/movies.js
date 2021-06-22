@@ -11,7 +11,7 @@ const _ = require("lodash");
 // PUBLIC ROUTE to get movies
 router.get("/", async (req, res) => {
   try {
-    console.log("");
+    // console.log("");
     // const {
     //   tmdb_movie_id,
     //   library_category_id,
@@ -25,10 +25,31 @@ router.get("/", async (req, res) => {
 
     // console.log(queryParts);
 
+    let queryParts = [];
+
+    // SELECT
+    // queryParts.push("SELECT *, count(*) OVER() AS total_results");
+    queryParts.push("SELECT *");
+
+    // FROM
+    queryParts.push("FROM tmdb_movie");
+
     // FIGURING OUT "WHERE" PART OF QUERY
     // create array from request, check for filters and at least one valid. if so, continue with where push
     // put any where lines in an array
     let queryWhereParts = [];
+
+    // this is for filters that need to reference other tables (genres, cast, crew, etc.)
+    let queryWhereIntersectParts = [];
+    /*
+    tmdb_movie_id in (
+      select tmdb_movie_id from tmdb_movie_genres where tmdb_movie_genre_id = 28
+      INTERSECT
+      select tmdb_movie_id from tmdb_movie_genres where tmdb_movie_genre_id = 12
+      INTERSECT
+      select tmdb_movie_id from tmdb_movie_cast where name = 'Ian McKellen'
+    )
+    */
 
     // might need this for free text filters
     // https://www.npmjs.com/package/pg-format
@@ -73,30 +94,37 @@ router.get("/", async (req, res) => {
       }
     };
 
-    let parseCheckboxListFilter = (name, tmdb_name, format) => {
+    let parseCheckboxListFilter = (
+      name,
+      tmdb_movie_table_list,
+      tmdb_movie_table_filter_id,
+      format
+    ) => {
       let filter = _.get(req, `query.${name}`);
 
-      let filterParts = [];
+      // let filterIds = [];
 
       if (filter) {
         // take out all characters that are not numbers or periods
         const filterSplit = filter.split(",");
         if (filterSplit.length > 0) {
           // console.log("filterSplit", filterSplit);
-        }
+          for (let i = 0; i < filterSplit.length; i++) {
+            const indexOfFilter = format.findIndex(
+              (f) => f.name === toTitleCase(filterSplit[i])
+            );
 
-        for (let i = 0; i < filterSplit.length; i++) {
-          const indexOfFilter = format.findIndex(
-            (f) => f.name === toTitleCase(filterSplit[i])
-          );
-
-          if (indexOfFilter >= 0) {
-            filterParts.push(indexOfFilter);
+            if (indexOfFilter >= 0) {
+              // filterIds.push(format[indexOfFilter].id);
+              queryWhereIntersectParts.push(
+                `select tmdb_movie_id from ${tmdb_movie_table_list} where ${tmdb_movie_table_filter_id} = ${format[indexOfFilter].id}`
+              );
+            }
           }
         }
       }
 
-      console.log(filterParts);
+      // console.log("queryintersect", queryWhereIntersectParts);
     };
 
     // SELECT id, title, genres
@@ -104,38 +132,66 @@ router.get("/", async (req, res) => {
     // CROSS JOIN lateral jsonb_array_elements(genres) id(ele)
     // WHERE (ele->>'id')::jsonb @> '28';
 
+    // INTERSECT queries first
+    parseCheckboxListFilter(
+      "genre",
+      "tmdb_movie_genres",
+      "tmdb_movie_genre_id",
+      genres
+    );
+    // other queries next
     parseSliderRangeFilter("score", "vote_average", 0, 100);
     parseSliderRangeFilter(
       "release",
       "release_date",
-      1896,
+      1874,
       new Date().getFullYear() + 1
     );
-    parseCheckboxListFilter("genre", "genres", genres);
     parseSliderRangeFilter("runtime", "runtime", 0, 300);
+    // parseSliderRangeFilter("score_count", "vote_count", 0, Number.MAX_VALUE);
 
-    let queryParts = [];
+    const sortedBy = _.get(req, `query.sort`);
 
-    // SELECT
-    queryParts.push(
-      "SELECT title, vote_average, vote_count, popularity, release_date, runtime, revenue, budget"
-    );
-
-    // FROM
-    queryParts.push("FROM tmdb_movie");
+    if (sortedBy === "score") {
+      queryWhereParts.push("vote_count > 100");
+    } else if (sortedBy === "release") {
+      queryWhereParts.push("release_date > '1799-01-01'");
+    } else if (sortedBy === "revenue") {
+      queryWhereParts.push("revenue > 1000");
+    } else if (sortedBy === "budget") {
+      queryWhereParts.push("budget > 1000");
+    }
 
     // WHERE
-    if (queryWhereParts.length > 0) {
-      queryParts.push("WHERE vote_count > 200 AND");
-      queryParts = queryParts.concat(queryWhereParts.join(" AND "));
+    if (queryWhereParts.length > 0 || queryWhereIntersectParts.length > 0) {
+      // queryParts.push("WHERE vote_count > 10 AND");
+      queryParts.push("WHERE");
+
+      if (queryWhereIntersectParts.length > 0) {
+        /*
+    tmdb_movie_id in (
+      select tmdb_movie_id from tmdb_movie_genres where tmdb_movie_genre_id = 28
+      INTERSECT
+      select tmdb_movie_id from tmdb_movie_genres where tmdb_movie_genre_id = 12
+      INTERSECT
+      select tmdb_movie_id from tmdb_movie_cast where name = 'Ian McKellen'
+    )
+    */
+        queryWhereParts = queryWhereParts.concat(
+          "id in (" + queryWhereIntersectParts.join(" INTERSECT ") + ")"
+        );
+      }
+      if (queryWhereParts.length > 0) {
+        queryParts = queryParts.concat(queryWhereParts.join(" AND "));
+      }
       // add these to queryParts
       // console.log("queryParts", queryParts);
     }
 
     // ORDER
     let parseSort = () => {
-      let sort = _.get(req, `query.sort`);
-      let order = _.get(req, `query.order`);
+      const sort = _.get(req, `query.sort`);
+      const order = _.get(req, `query.order`);
 
       let currentSort = "popularity";
       let currentOrder = "desc";
@@ -147,6 +203,8 @@ router.get("/", async (req, res) => {
           currentSort = "release_date";
         } else if (sort === "revenue") {
           currentSort = "revenue";
+        } else if (sort === "budget") {
+          currentSort = "budget";
         }
         if (order === "asc") {
           currentOrder = "asc";
@@ -180,7 +238,7 @@ router.get("/", async (req, res) => {
     parsePage();
     // queryParts.push("LIMIT 20");
 
-    console.log(queryParts.join(" "));
+    // console.log(queryParts.join(" "));
 
     // generate
     const movies = await pool.query(
@@ -188,9 +246,11 @@ router.get("/", async (req, res) => {
       // , [id]
     );
 
+    // console.log("total results", movies.rows[0].total_results);
+
     res.json(movies.rows);
-    console.log("Movies sent.");
-    console.log(" ");
+    // console.log("Movies sent.");
+    // console.log(" ");
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");

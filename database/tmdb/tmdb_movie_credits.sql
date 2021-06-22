@@ -9,3 +9,9 @@ updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 PRIMARY KEY (id)
 );
+
+-- changed cast_list to jsonb for query testing
+ALTER TABLE tmdb_movie_credits
+ALTER COLUMN cast_list
+TYPE jsonb 
+USING cast_list::jsonb;

@@ -39,6 +39,12 @@ DROP TABLE name_here;
 -- delete row
 delete from app_user where user_name = 'jacob';
 
+delete from tmdb_movie where id = 2061;
+
 -- check types
 select column_name, data_type from information_schema.columns
 where table_name = 'tmdb_movie';
+
+-- runtime
+EXPLAIN ANALYZE
+-- query here

@@ -2,8 +2,8 @@ const express = require("express");
 // const pool = require("../db");
 const router = express.Router();
 
-const movies = require("./movies");
-const storeMovie = require("../../utils/storeMovie");
+const people = require("./people");
+const storePerson = require("../../utils/storePerson");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -12,7 +12,7 @@ router.get("/", async (req, res, next) => {
     //   const throttleTime = 500; // in milliseconds
     //   if (i < arr.length) {
     //     // console.log(i, arr[i]);
-    //     await storeMovie(arr[i].id);
+    //     await storePerson(arr[i].id);
     //     i++;
     //     setTimeout(myCoolFunction, throttleTime, arr, i);
     //   } else {
@@ -21,13 +21,11 @@ router.get("/", async (req, res, next) => {
     //   }
     // };
 
-    // await myCoolFunction(movies, 0);
+    // await myCoolFunction(people, 0);
 
-    // for (let i = 0; i < movies.length; i++) {
-    for (let i = 35000; i < movies.length; i++) {
-      // for (let i = 252000; i < movies.length; i++) {
+    for (let i = 0; i < people.length; i++) {
       console.log("i:", i);
-      await storeMovie(movies[i].id);
+      await storePerson(people[i].id);
     }
     console.log("Finished.");
     res.send("Finished.");

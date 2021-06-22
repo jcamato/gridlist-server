@@ -5,12 +5,13 @@ module.exports = async function (id) {
   try {
     const stored_movie_appended = await pool.query(
       [
-        "SELECT m.id, m.title",
+        "SELECT distinct m.id, m.title",
         "FROM tmdb_movie AS m",
-        "INNER JOIN tmdb_movie_videos AS v ON m.id = v.id",
-        "INNER JOIN tmdb_movie_images AS i ON m.id = i.id",
-        "INNER JOIN tmdb_movie_credits AS c ON m.id = c.id",
-        "INNER JOIN tmdb_movie_keywords AS k ON m.id = k.id",
+        "INNER JOIN tmdb_movie_genres AS g ON m.id = g.tmdb_movie_id",
+        // "INNER JOIN tmdb_movie_videos AS v ON m.id = v.id",
+        // "INNER JOIN tmdb_movie_images AS i ON m.id = i.id",
+        // "INNER JOIN tmdb_movie_credits AS c ON m.id = c.id",
+        // "INNER JOIN tmdb_movie_keywords AS k ON m.id = k.id",
         "WHERE m.id = $1",
       ].join(" "),
       [id]
@@ -56,8 +57,10 @@ module.exports = async function (id) {
           movie.title
         );
 
+        // movie detail
         const text_tmdb_movie =
           "INSERT INTO tmdb_movie(adult, backdrop_path, belongs_to_collection, budget, genres, homepage, id, imdb_id, original_language, original_title, overview, popularity, poster_path, production_companies, production_countries, release_date, revenue, runtime, spoken_languages, status, tagline, title, video, vote_average, vote_count) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25) ON CONFLICT ON CONSTRAINT tmdb_movie_pkey DO NOTHING RETURNING *";
+
         const values_tmdb_movie = [
           movie.adult,
           movie.backdrop_path,
@@ -87,28 +90,46 @@ module.exports = async function (id) {
         ];
         await pool.query(text_tmdb_movie, values_tmdb_movie);
 
-        if (movie.videos.results) {
-          const text_tmdb_movie_videos =
-            "INSERT INTO tmdb_movie_videos(id, results) VALUES($1, $2) ON CONFLICT ON CONSTRAINT tmdb_movie_videos_pkey DO NOTHING RETURNING *";
+        // console.log(movie.genres);
 
-          const values_tmdb_movie_videos = [
-            movie.id,
-            JSON.stringify(movie.videos.results),
-          ];
-          await pool.query(text_tmdb_movie_videos, values_tmdb_movie_videos);
+        // genres
+        if (movie.genres.length > 0) {
+          for (let i = 0; i < movie.genres.length; i++) {
+            const text_tmdb_movie_genres =
+              "INSERT INTO tmdb_movie_genres(id, tmdb_movie_id, tmdb_movie_genre_id) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_genres_pkey DO NOTHING RETURNING *";
+            const values_tmdb_movie_genres = [
+              [movie.id, movie.genres[i].id].join("-"),
+              movie.id,
+              movie.genres[i].id,
+            ];
+
+            await pool.query(text_tmdb_movie_genres, values_tmdb_movie_genres);
+          }
         }
 
-        if (movie.images.backdrops || movie.images.posters) {
-          const text_tmdb_movie_images =
-            "INSERT INTO tmdb_movie_images(id, backdrops, posters) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_images_pkey DO NOTHING RETURNING *";
-          const values_tmdb_movie_images = [
-            movie.id,
-            JSON.stringify(movie.images.backdrops),
-            JSON.stringify(movie.images.posters),
-          ];
-          await pool.query(text_tmdb_movie_images, values_tmdb_movie_images);
-        }
+        // if (movie.videos.results) {
+        //   const text_tmdb_movie_videos =
+        //     "INSERT INTO tmdb_movie_videos(id, results) VALUES($1, $2) ON CONFLICT ON CONSTRAINT tmdb_movie_videos_pkey DO NOTHING RETURNING *";
 
+        //   const values_tmdb_movie_videos = [
+        //     movie.id,
+        //     JSON.stringify(movie.videos.results),
+        //   ];
+        //   await pool.query(text_tmdb_movie_videos, values_tmdb_movie_videos);
+        // }
+
+        // if (movie.images.backdrops || movie.images.posters) {
+        //   const text_tmdb_movie_images =
+        //     "INSERT INTO tmdb_movie_images(id, backdrops, posters) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_images_pkey DO NOTHING RETURNING *";
+        //   const values_tmdb_movie_images = [
+        //     movie.id,
+        //     JSON.stringify(movie.images.backdrops),
+        //     JSON.stringify(movie.images.posters),
+        //   ];
+        //   await pool.query(text_tmdb_movie_images, values_tmdb_movie_images);
+        // }
+
+        // credits
         if (movie.credits.cast || movie.credits.crew) {
           const text_tmdb_movie_credits =
             "INSERT INTO tmdb_movie_credits(id, cast_list, crew) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_credits_pkey DO NOTHING RETURNING *";
@@ -120,19 +141,19 @@ module.exports = async function (id) {
           await pool.query(text_tmdb_movie_credits, values_tmdb_movie_credits);
         }
 
-        if (movie.keywords.keywords) {
-          const text_tmdb_movie_keywords =
-            "INSERT INTO tmdb_movie_keywords(id, keywords) VALUES($1, $2) ON CONFLICT ON CONSTRAINT tmdb_movie_keywords_pkey DO NOTHING RETURNING *";
+        // if (movie.keywords.keywords) {
+        //   const text_tmdb_movie_keywords =
+        //     "INSERT INTO tmdb_movie_keywords(id, keywords) VALUES($1, $2) ON CONFLICT ON CONSTRAINT tmdb_movie_keywords_pkey DO NOTHING RETURNING *";
 
-          const values_tmdb_movie_keywords = [
-            movie.id,
-            JSON.stringify(movie.keywords.keywords),
-          ];
-          await pool.query(
-            text_tmdb_movie_keywords,
-            values_tmdb_movie_keywords
-          );
-        }
+        //   const values_tmdb_movie_keywords = [
+        //     movie.id,
+        //     JSON.stringify(movie.keywords.keywords),
+        //   ];
+        //   await pool.query(
+        //     text_tmdb_movie_keywords,
+        //     values_tmdb_movie_keywords
+        //   );
+        // }
 
         // console.log("Stored.");
       };
