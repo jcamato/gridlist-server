@@ -4,7 +4,7 @@ adult                     BOOLEAN NOT NULL,
 backdrop_path             TEXT,
 belongs_to_collection     JSON, -- separate table?
 budget                    BIGINT NOT NULL,
-genres                    JSON NOT NULL, -- separate table?
+genres                    JSON NOT NULL, -- separate table is for filters. remove this and also use that for details page?
 homepage                  TEXT,
 id                        INTEGER NOT NULL UNIQUE,
 imdb_id                   TEXT,
