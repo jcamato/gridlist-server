@@ -2,11 +2,12 @@
 CREATE TABLE IF NOT EXISTS app_user (
   id                      UUID          DEFAULT uuid_generate_v4(), -- FIX: SERIAL NOT NULL UNIQUE?
 
-  username                VARCHAR(255)  NOT NULL  UNIQUE, -- validate length, no spaces, special chars, symbol, order, etc.
+  username_display        VARCHAR(24)  NOT NULL  UNIQUE, -- FIX: validate length, no spaces, special chars, symbol, order, etc. (no spaces, certain special characters like _, min length 2, max length 24)
+  username                VARCHAR(24)  NOT NULL  UNIQUE, -- lowercase version of username_display
   email                   VARCHAR(255)  NOT NULL  UNIQUE,
-  password                VARCHAR(255)  NOT NULL,
-  name_first              VARCHAR(255),
-  name_last               VARCHAR(255),
+  password                VARCHAR(255)  NOT NULL, -- FIX: validate length, types of characters, no spaces, etc. (min length 8...)
+  name_first              VARCHAR(64),
+  name_last               VARCHAR(64),
   darkmode                BOOLEAN       NOT NULL  DEFAULT false,
   score_scale             SMALLINT      NOT NULL  DEFAULT 100,
   adult_hide              BOOLEAN       NOT NULL  DEFAULT true,

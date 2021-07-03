@@ -5,59 +5,58 @@ const _ = require("lodash");
 
 // utils
 const toTitleCase = require("../utils/toTitleCase");
-const { notDeepEqual } = require("assert");
 
 // return Object of all movie IDs in library of given user id
-module.exports.getAllMovieIDsInLibraryOfUser = async function (user_id) {
-  try {
-    let text = [];
-    let values = [];
+// module.exports.getAllMovieIDsInLibraryOfUser = async function (user_id) {
+//   try {
+//     let text = [];
+//     let values = [];
 
-    text.push("SELECT lm.tmdb_movie_id");
-    text.push("FROM library_movie as lm");
-    text.push("WHERE lm.user_id = $1");
+//     text.push("SELECT lm.tmdb_movie_id");
+//     text.push("FROM library_movie as lm");
+//     text.push("WHERE lm.user_id = $1");
 
-    values = [user_id];
+//     values = [user_id];
 
-    const response = await pool.query(text.join(" "), values);
+//     const response = await pool.query(text.join(" "), values);
 
-    return response.rows;
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
-  }
-};
+//     return response.rows;
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send("Server error");
+//   }
+// };
 
 // return Object of all movie IDs and their category in library of given user id (and optional category)
-module.exports.getAllMovieIDsInLibraryOfUserByCategory = async function (
-  user_id,
-  category
-) {
-  try {
-    let text = [];
-    let values = [];
+// module.exports.getAllMovieIDsInLibraryOfUserByCategory = async function (
+//   user_id,
+//   category
+// ) {
+//   try {
+//     let text = [];
+//     let values = [];
 
-    text.push("SELECT lm.tmdb_movie_id, lm.library_category_id");
-    text.push("FROM library_movie as lm");
-    text.push("WHERE lm.user_id = $1");
+//     text.push("SELECT lm.tmdb_movie_id, lm.library_category_id");
+//     text.push("FROM library_movie as lm");
+//     text.push("WHERE lm.user_id = $1");
 
-    if (category) {
-      text.push("AND lm.library_category_id = $2");
-      values = [user_id, category];
-    } else {
-      values = [user_id];
-    }
+//     if (category) {
+//       text.push("AND lm.library_category_id = $2");
+//       values = [user_id, category];
+//     } else {
+//       values = [user_id];
+//     }
 
-    const response = await pool.query(text.join(" "), values);
+//     const response = await pool.query(text.join(" "), values);
 
-    return response.rows;
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
-  }
-};
+//     return response.rows;
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send("Server error");
+//   }
+// };
 
-const getLibraryMovie = async (user_id, tmdb_movie_id) => {
+const getLibraryMovieData = async (tmdb_movie_id, user_id) => {
   const libraryMovie = await pool.query(
     "SELECT library_category_id, score, watch_date, watch_count FROM library_movie WHERE user_id = $1 AND tmdb_movie_id = $2",
     [user_id, tmdb_movie_id]
@@ -66,49 +65,66 @@ const getLibraryMovie = async (user_id, tmdb_movie_id) => {
   return libraryMovie.rows[0];
 };
 
-// const addAuthenticatedUserLibraryData = async (
-//   array,
-//   authenticatedUserId
-// ) => {
-//   for (let i = 0; i < array.length; i++) {
+const appendLibraryMovieData = async (
+  movies,
+  authenticatedUserId,
+  libraryUserId
+) => {
+  const moviesAppended = _.cloneDeep(movies);
 
-//     let authenticatedUserLibraryData = {
-//       library_category_id: null,
-//       score: null,
-//       watch_date: null,
-//       watch_count: null,
-//     };
+  for (let i = 0; i < moviesAppended.length; i++) {
+    let authenticatedUserLibraryData = {
+      library_category_id: null,
+      score: null,
+      watch_date: null,
+      watch_count: null,
+    };
 
-//     if (authenticatedUserId) {
-//       const libraryMovie = await getLibraryMovie(
-//         authenticatedUserId,
-//         element.id
-//       );
+    if (authenticatedUserId) {
+      const libraryMovie = await getLibraryMovieData(
+        moviesAppended[i].id,
+        authenticatedUserId
+      );
 
-//       if (libraryMovie) {
-//         authenticatedUserLibraryData = {
-//           library_category_id: libraryMovie.library_category_id,
-//           score: libraryMovie.score,
-//           watch_date: libraryMovie.watch_date,
-//           watch_count: libraryMovie.watch_count,
-//         };
-//       }
-//     }
+      if (libraryMovie) {
+        authenticatedUserLibraryData.library_category_id =
+          libraryMovie.library_category_id;
+        authenticatedUserLibraryData.score = libraryMovie.score;
+        authenticatedUserLibraryData.watch_date = libraryMovie.watch_date;
+        authenticatedUserLibraryData.watch_count = libraryMovie.watch_count;
+      }
+    }
 
-//     newCollection[i] = {array[i], authenticatedUserLibraryData}
+    moviesAppended[i].authenticatedUserLibraryData =
+      authenticatedUserLibraryData;
 
-//     // for some reason when authenticatedUserId this data object isn't even being attached
-//     returnedMovies[index].authenticatedUserLibraryData =
-//       authenticatedUserLibraryData;
-//   }
+    let libraryUserLibraryData = {
+      library_category_id: null,
+      score: null,
+      watch_date: null,
+      watch_count: null,
+    };
 
-// const libraryMovie = await pool.query(
-//   "SELECT library_category_id, score, watch_date, watch_count FROM library_movie WHERE user_id = $1 AND tmdb_movie_id = $2",
-//   [user_id, tmdb_movie_id]
-// );
+    if (libraryUserId) {
+      const libraryMovie = await getLibraryMovieData(
+        moviesAppended[i].id,
+        libraryUserId
+      );
 
-//   return newCollection;
-// };
+      if (libraryMovie) {
+        libraryUserLibraryData.library_category_id =
+          libraryMovie.library_category_id;
+        libraryUserLibraryData.score = libraryMovie.score;
+        libraryUserLibraryData.watch_date = libraryMovie.watch_date;
+        libraryUserLibraryData.watch_count = libraryMovie.watch_count;
+      }
+    }
+
+    moviesAppended[i].libraryUserLibraryData = libraryUserLibraryData;
+  }
+
+  return moviesAppended;
+};
 
 // return movie data depending on query. Attach user object to each movie that is null or populated with an autheticated user's data for that movie. If this is passed an ID list, add this condition to the ID INTERSECT statement
 
@@ -145,12 +161,12 @@ module.exports.getMovies = async function (options) {
       if (authenticatedUserId && authenticatedUserId === libraryUserId) {
         // if authenticated user is the library user, show all items
         queryParts.push(
-          `INNER JOIN library_movie AS lm ON lm.user_id = '${library_user_id}' AND lm.tmdb_movie_id = tmdb_movie.id`
+          `INNER JOIN library_movie AS lm ON lm.user_id = '${libraryUserId}' AND lm.tmdb_movie_id = tmdb_movie.id`
         );
       } else {
         // if not, only show non private items
         queryParts.push(
-          `INNER JOIN library_movie AS lm ON lm.user_id = '${library_user_id}' AND lm.private = false AND lm.tmdb_movie_id = tmdb_movie.id`
+          `INNER JOIN library_movie AS lm ON lm.user_id = '${libraryUserId}' AND lm.private = false AND lm.tmdb_movie_id = tmdb_movie.id`
         );
       }
     }
@@ -277,6 +293,7 @@ module.exports.getMovies = async function (options) {
 
     const sortedBy = _.get(options, `query.sort`);
 
+    // Depending on the chosen sort, minimum conditions should be set for these fields to remove low or missing values when viewing in ascending order
     if (sortedBy === "score") {
       queryWhereParts.push("vote_count > 100");
     } else if (sortedBy === "release") {
@@ -363,6 +380,7 @@ module.exports.getMovies = async function (options) {
     parsePage();
     // queryParts.push("LIMIT 20");
 
+    console.log(" ");
     console.log(queryParts.join(" "));
 
     // generate
@@ -373,70 +391,13 @@ module.exports.getMovies = async function (options) {
 
     const returnedMovies = response.rows;
 
-    // now that we have movies
-    // if options.authenticatedUser, attach authenticatedUserLibraryData object to each movie
+    const finalMovies = await appendLibraryMovieData(
+      returnedMovies,
+      authenticatedUserId,
+      libraryUserId
+    );
 
-    returnedMovies.forEach(async (element, index) => {
-      let authenticatedUserLibraryData = {
-        library_category_id: null,
-        score: null,
-        watch_date: null,
-        watch_count: null,
-      };
-
-      if (authenticatedUserId) {
-        const libraryMovie = await getLibraryMovie(
-          authenticatedUserId,
-          element.id
-        );
-
-        if (libraryMovie) {
-          authenticatedUserLibraryData = {
-            library_category_id: libraryMovie.library_category_id,
-            score: libraryMovie.score,
-            watch_date: libraryMovie.watch_date,
-            watch_count: libraryMovie.watch_count,
-          };
-        }
-      }
-
-      // FIX: for some reason when authenticatedUserId this data object isn't even being attached
-      returnedMovies[index].authenticatedUserLibraryData =
-        authenticatedUserLibraryData;
-    });
-
-    // if libraryUser, attach userLibraryData object to each movie
-
-    // options = {
-    //   query: query,
-    //   authenticatedUser: {},
-    //   libraryUser: {},
-    // };
-
-    return returnedMovies;
-    // return response;
-
-    // if (_.isEmpty(query)) {
-    //   // if no query or user id then we have the following default fetch
-    //   response = await pool.query(
-    //     [
-    //       "SELECT *",
-    //       "FROM tmdb_movie",
-    //       "ORDER BY popularity DESC, vote_count DESC",
-    //       "LIMIT 20",
-    //     ].join(" ")
-    //   );
-    // } else {
-    //   response = await pool.query(
-    //     [
-    //       "SELECT *",
-    //       "FROM tmdb_movie",
-    //       "WHERE vote_count > 1000",
-    //       "ORDER BY vote_average DESC, vote_count DESC",
-    //       "LIMIT 20",
-    //     ].join(" ")
-    //   );
-    // }
+    return finalMovies;
   } catch (err) {
     console.error(err.message);
     // res.status(500).send("Server error");
