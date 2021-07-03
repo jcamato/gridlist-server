@@ -1,7 +1,7 @@
 -- tmdb_movie_genre
 CREATE TABLE tmdb_movie_genre (
 id                        INTEGER NOT NULL UNIQUE,
-genre                     TEXT,
+name                      TEXT,
 
 -- custom fields
 created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, 
@@ -11,7 +11,7 @@ PRIMARY KEY (id)
 );
 
 -- FIX: instead of hardcoding fetch endpoint https://api.themoviedb.org/3/genre/movie/list
-INSERT INTO tmdb_movie_genre (id, genre)
+INSERT INTO tmdb_movie_genre (id, name)
   VALUES
     (28, 'Action'),
     (12, 'Adventure'),

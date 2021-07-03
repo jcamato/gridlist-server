@@ -45,6 +45,10 @@ delete from tmdb_movie where id = 2061;
 select column_name, data_type from information_schema.columns
 where table_name = 'tmdb_movie';
 
+-- rename column
+ALTER TABLE table_name 
+RENAME COLUMN column_name TO new_column_name;
+
 -- runtime
 EXPLAIN ANALYZE
 -- query here

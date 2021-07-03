@@ -1,6 +1,6 @@
 -- create app_user table, user is reservered
 CREATE TABLE IF NOT EXISTS app_user (
-  id                      UUID          DEFAULT uuid_generate_v4(), -- SERIAL NOT NULL UNIQUE?
+  id                      UUID          DEFAULT uuid_generate_v4(), -- FIX: SERIAL NOT NULL UNIQUE?
 
   username                VARCHAR(255)  NOT NULL  UNIQUE, -- validate length, no spaces, special chars, symbol, order, etc.
   email                   VARCHAR(255)  NOT NULL  UNIQUE,
