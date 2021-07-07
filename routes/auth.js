@@ -16,15 +16,26 @@ router.post("/register", validate, async (req, res) => {
 
   try {
     // 2. check if user exists (if user exists then throw error)
-    const user = await pool.query(
-      "SELECT username FROM app_user WHERE email = $1",
+    const emailCheck = await pool.query(
+      "SELECT username FROM app_user WHERE LOWER(email) = LOWER($1)",
       [email]
     );
 
-    if (user.rows.length > 0) {
+    if (emailCheck.rows.length > 0) {
       return res
         .status(401)
         .json("There is already an account with that email");
+    }
+
+    const usernameCheck = await pool.query(
+      "SELECT username FROM app_user WHERE LOWER(username) = LOWER($1)",
+      [username]
+    );
+
+    if (usernameCheck.rows.length > 0) {
+      return res
+        .status(401)
+        .json("There is already an account with that username");
     }
 
     // 3. bcrypt the user password
@@ -59,9 +70,10 @@ router.post("/login", validate, async (req, res) => {
 
   try {
     // 2. check if user doesn't exist (if not then we throw error)
-    const user = await pool.query("SELECT * FROM app_user WHERE email = $1", [
-      email,
-    ]);
+    const user = await pool.query(
+      "SELECT * FROM app_user WHERE LOWER(email) = LOWER($1)",
+      [email]
+    );
 
     if (user.rows.length === 0) {
       return res.status(401).json("There is no account with that email");

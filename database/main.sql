@@ -37,7 +37,7 @@ INSERT INTO app_user (username, email, password)
 DROP TABLE name_here;
 
 -- delete row
-delete from app_user where username = 'jacob';
+delete from app_user where username = 'kravek';
 
 delete from tmdb_movie where id = 2061;
 
@@ -48,6 +48,19 @@ where table_name = 'tmdb_movie';
 -- rename column
 ALTER TABLE table_name 
 RENAME COLUMN column_name TO new_column_name;
+
+-- add column
+ALTER TABLE app_user 
+ADD COLUMN username_display VARCHAR(24);
+
+-- drop column
+ALTER TABLE app_user 
+DROP COLUMN username_display;
+
+-- set column's value to another
+UPDATE app_user
+SET username_display=username
+WHERE username_display IS NULL AND username IS NOT NULL;
 
 -- runtime
 EXPLAIN ANALYZE
