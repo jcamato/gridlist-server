@@ -42,9 +42,6 @@ app.use(
 );
 app.use("/testing", require("./routes/testing"));
 
-// test environment, not for production
-app.use("/queryBuilderTest", require("./routes/queryBuilderTest"));
-
 app.listen(process.env.PORT, () =>
   console.log(
     `Server started on port ${process.env.PORT}. See http://localhost:${process.env.PORT}/`

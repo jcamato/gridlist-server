@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const pool = require("../db");
+
 const validate = require("../middleware/validate");
 const generateJWT = require("../utils/generateJWT");
 const authorize = require("../middleware/authorize");
@@ -16,7 +17,7 @@ router.post("/register", validate, async (req, res) => {
   try {
     // 2. check if user exists (if user exists then throw error)
     const user = await pool.query(
-      "SELECT user_name FROM app_user WHERE email = $1",
+      "SELECT username FROM app_user WHERE email = $1",
       [email]
     );
 
@@ -32,17 +33,17 @@ router.post("/register", validate, async (req, res) => {
 
     // 4. enter the new user inside our database
     let newUser = await pool.query(
-      "INSERT INTO app_user (user_name, email, password) VALUES ($1, $2, $3) RETURNING user_id",
+      "INSERT INTO app_user (username, email, password) VALUES ($1, $2, $3) RETURNING id",
       [username, email, bcryptPassword]
     );
 
     // 5. generate our jwt token
-    const jwtToken = generateJWT(newUser.rows[0].user_id);
+    const jwtToken = generateJWT(newUser.rows[0].id);
 
     return res.json({ jwtToken });
   } catch (err) {
     console.error(err.message);
-    if (err.constraint == "app_user_user_name_key") {
+    if (err.constraint == "app_user_username_key") {
       return res.status(401).json("Username already exist");
     }
     res.status(500).send("Server error");
@@ -74,7 +75,7 @@ router.post("/login", validate, async (req, res) => {
     }
 
     // 4. give the jwt auth_token
-    const jwtToken = generateJWT(user.rows[0].user_id);
+    const jwtToken = generateJWT(user.rows[0].id);
     return res.json({ jwtToken });
   } catch (err) {
     console.error(err.message);

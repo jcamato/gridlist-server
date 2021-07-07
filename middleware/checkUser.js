@@ -1,10 +1,8 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-// FIX: should this just resolve to user = 'GUEST' if not a valid token or token is missing?
-// check if request is coming from a User or Guest. Pass on res.locals.user as 'GUEST' or USER_ID
 module.exports = function (req, res, next) {
-  // initialize authentication to false
+  // initialize authentication to false, this represents a Guest user
   res.locals.authenticated = false;
 
   try {
@@ -20,6 +18,7 @@ module.exports = function (req, res, next) {
       res.locals.user = verify.user;
     }
 
+    // console.log("checkUser, Next()");
     next();
   } catch (err) {
     // if header token is not a valid token

@@ -1,3 +1,5 @@
+// FIX: more robust validation like a library such as JOI? https://joi.dev/api/
+
 module.exports = function (req, res, next) {
   const { username, email, password } = req.body;
 

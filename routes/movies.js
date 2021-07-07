@@ -7,7 +7,7 @@ const toTitleCase = require("../utils/toTitleCase");
 
 const _ = require("lodash");
 
-// PUBLIC? route to get movies genre. However, when formatting I can just add SERVER QUERY to obtain this instead of having a route?
+// PUBLIC? route to get movies genre. However, when formatting I can just add a SERVER QUERY to obtain this instead of having a route?
 router.get("/genre", async (req, res) => {
   try {
     const genre = await pool.query("SELECT * FROM tmdb_movie_genre");

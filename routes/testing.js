@@ -7,27 +7,6 @@ const moviesCore = require("../utils/movies");
 
 router.get("/", checkUser, async (req, res) => {
   try {
-    // const user_id = req.headers.user_id;
-    // const category = parseInt(req.headers.category);
-
-    // console.log("req", req);
-    // console.log("res.locals", res.locals);
-
-    // console.log(res.locals.user);
-
-    // const idList = await moviesCore.getAllMovieIDsInLibraryOfUser(
-    //   res.locals.user.id
-    // );
-    // res.json(idList);
-
-    // const text = [
-    //   "SELECT tm.title, lm.library_category_id, lm.score",
-    //   "FROM app_user AS u",
-    //   "INNER JOIN library_movie AS lm ON u.user_id = lm.user_id",
-    //   "LEFT JOIN tmdb_movie AS tm ON lm.tmdb_movie_id = tm.id",
-    //   "WHERE u.user_id = $1",
-    // ].join(" ");
-
     const text = [
       "SELECT tm.title, tm.popularity, lm.library_category_id, lm.score, lm.private",
       "FROM tmdb_movie AS tm",
@@ -42,9 +21,9 @@ router.get("/", checkUser, async (req, res) => {
     // const username = "123";
 
     // const text = [
-    //   "SELECT user_id, user_name",
+    //   "SELECT id, username",
     //   "FROM app_user AS u",
-    //   "WHERE user_name = $1",
+    //   "WHERE username = $1",
     // ].join(" ");
 
     const userList = await pool.query(text, values);

@@ -5,11 +5,11 @@ const authorize = require("../middleware/authorize");
 const checkMovieStorage = require("../middleware/checkMovieStorage");
 
 //get all library movie items from authenticated user
-router.get("/movie", authorize, async (req, res) => {
+router.get("/movie", async (req, res) => {
   try {
     // console.log(req.user);
     const library = await pool.query(
-      "SELECT lm.library_movie_id, lm.tmdb_movie_id, lm.library_category_id, lm.score, lm.watch_date, lm.watch_count, lm.private, tm.title, tm.poster_path, tm.vote_average, tm.release_date, tm.overview, tm.backdrop_path FROM app_user AS u INNER JOIN library_movie AS lm ON u.user_id = lm.user_id LEFT JOIN tmdb_movie AS tm ON lm.tmdb_movie_id = tm.id WHERE u.user_id = $1",
+      "SELECT lm.id, lm.tmdb_movie_id, lm.library_category_id, lm.score, lm.watch_date, lm.watch_count, lm.private, tm.title, tm.poster_path, tm.vote_average, tm.release_date, tm.overview, tm.backdrop_path FROM app_user AS u INNER JOIN library_movie AS lm ON u.id = lm.user_id LEFT JOIN tmdb_movie AS tm ON lm.tmdb_movie_id = tm.id WHERE u.id = $1",
       [req.user.id]
     );
 
@@ -21,7 +21,7 @@ router.get("/movie", authorize, async (req, res) => {
 });
 
 //get one library movie item from authenticated user
-router.get("/movie/:id", authorize, async (req, res) => {
+router.get("/movie/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -123,7 +123,7 @@ router.post("/movie", authorize, checkMovieStorage, async (req, res) => {
 //     }
 //     console.log(setString);
 //     const updateMovie = await pool.query(
-//       `UPDATE library_movie SET ${setString} WHERE library_movie_id = $1 AND user_id = $2 RETURNING * `,
+//       `UPDATE library_movie SET ${setString} WHERE id = $1 AND user_id = $2 RETURNING * `,
 //       [id, req.user.id, library_category_id, score]
 //     );
 //     res.json(req.body);
@@ -139,7 +139,7 @@ router.post("/movie", authorize, checkMovieStorage, async (req, res) => {
 //     const { id } = req.params;
 //     const { library_category_id, score, watch_date } = req.body;
 //     const updateMovie = await pool.query(
-//       "UPDATE library_movie SET library_category_id = COALESCE($1, library_category_id), score = COALESCE($2, score), watch_date = COALESCE($3, watch_date) WHERE library_movie_id = $4 AND user_id = $5 RETURNING * ",
+//       "UPDATE library_movie SET library_category_id = COALESCE($1, library_category_id), score = COALESCE($2, score), watch_date = COALESCE($3, watch_date) WHERE id = $4 AND user_id = $5 RETURNING * ",
 //       [library_category_id, score, watch_date, id, req.user.id]
 //     );
 
@@ -160,7 +160,7 @@ router.post("/movie", authorize, checkMovieStorage, async (req, res) => {
 //     const { id } = req.params;
 //     const { library_category_id, score, watch_date } = req.body;
 //     const updateMovie = await pool.query(
-//       "UPDATE library_movie SET library_category_id = COALESCE($1, library_category_id), score = COALESCE($2, score), watch_date = COALESCE($3, watch_date) WHERE library_movie_id = $4 AND user_id = $5 RETURNING * ",
+//       "UPDATE library_movie SET library_category_id = COALESCE($1, library_category_id), score = COALESCE($2, score), watch_date = COALESCE($3, watch_date) WHERE id = $4 AND user_id = $5 RETURNING * ",
 //       [library_category_id, score, watch_date, id, req.user.id]
 //     );
 
@@ -179,7 +179,7 @@ router.delete("/movie/:libid", authorize, async (req, res) => {
   try {
     const { libid } = req.params;
     const deleteMovie = await pool.query(
-      "DELETE FROM library_movie WHERE library_movie_id = $1 AND user_id = $2 RETURNING *",
+      "DELETE FROM library_movie WHERE id = $1 AND user_id = $2 RETURNING *",
       [libid, req.user.id]
     );
 

@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS library_movie (
   score                   SMALLINT,
   watch_date              DATE, -- TEXT
   watch_count             SMALLINT      NOT NULL  DEFAULT 0,
-  -- rewatch_dates           DATE[],
+  -- watch_dates           DATE[],
   private                 BOOLEAN       NOT NULL  DEFAULT false, -- 'secret', or 'visibility'?
-  -- notes                   TEXT,
+  notes                   TEXT,
 
   created_at              TIMESTAMPTZ   NOT NULL  DEFAULT CURRENT_TIMESTAMP, 
   updated_at              TIMESTAMPTZ   NOT NULL  DEFAULT CURRENT_TIMESTAMP,

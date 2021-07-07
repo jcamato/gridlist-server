@@ -37,8 +37,11 @@ module.exports = async function (id) {
       const APP_KEY = process.env.TMDB_KEY;
 
       const fetchMovieAndStore = async () => {
+        // const response = await fetch(
+        //   `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}&append_to_response=videos,images,credits,keywords`
+        // );
         const response = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}&append_to_response=videos,images,credits,keywords`
+          `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}`
         );
         const movie = await response.json();
         // res.json(movie);
@@ -130,16 +133,16 @@ module.exports = async function (id) {
         // }
 
         // credits
-        if (movie.credits.cast || movie.credits.crew) {
-          const text_tmdb_movie_credits =
-            "INSERT INTO tmdb_movie_credits(id, cast_list, crew) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_credits_pkey DO NOTHING RETURNING *";
-          const values_tmdb_movie_credits = [
-            movie.id,
-            JSON.stringify(movie.credits.cast),
-            JSON.stringify(movie.credits.crew),
-          ];
-          await pool.query(text_tmdb_movie_credits, values_tmdb_movie_credits);
-        }
+        // if (movie.credits.cast || movie.credits.crew) {
+        //   const text_tmdb_movie_credits =
+        //     "INSERT INTO tmdb_movie_credits(id, cast_list, crew) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_credits_pkey DO NOTHING RETURNING *";
+        //   const values_tmdb_movie_credits = [
+        //     movie.id,
+        //     JSON.stringify(movie.credits.cast),
+        //     JSON.stringify(movie.credits.crew),
+        //   ];
+        //   await pool.query(text_tmdb_movie_credits, values_tmdb_movie_credits);
+        // }
 
         // if (movie.keywords.keywords) {
         //   const text_tmdb_movie_keywords =

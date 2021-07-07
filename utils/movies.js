@@ -151,7 +151,7 @@ module.exports.getMovies = async function (options) {
 
     // SELECT
     // queryParts.push("SELECT *, count(*) OVER() AS total_results");
-    queryParts.push("SELECT *");
+    queryParts.push("SELECT tmdb_movie.*");
 
     // FROM
     queryParts.push("FROM tmdb_movie");

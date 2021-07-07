@@ -30,14 +30,14 @@ create extension if not exists "uuid-ossp";
 DROP DATABASE name_here;
 
 -- insert data
-INSERT INTO app_user (user_name, email, password)
+INSERT INTO app_user (username, email, password)
   VALUES ('first', 'first@email.com', 'regularpw');
 
 -- delete table
 DROP TABLE name_here;
 
 -- delete row
-delete from app_user where user_name = 'jacob';
+delete from app_user where username = 'jacob';
 
 delete from tmdb_movie where id = 2061;
 

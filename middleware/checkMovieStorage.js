@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 
 // This middleware will check local storage for the existence of a movie and its related tables (videos, images, credits)
 // If this movie does not exist in any of the 4 tables, it will fetch the data from TMDB and store this locally for access
-// FIX: This middleware might need to account for scheduled updates and overwrites that will be done elsewhere
+// FIX: This middleware isn't needed anymore since browse and movies are always from database. However, this middleware can be updated the refresh movie data? account for scheduled updates and overwrites that will be done elsewhere
 
 module.exports = async function (req, res, next) {
   try {
