@@ -62,6 +62,46 @@ UPDATE app_user
 SET username_display=username
 WHERE username_display IS NULL AND username IS NOT NULL;
 
+-- change column type
+ALTER TABLE tmdb_person 
+ALTER COLUMN imdb_id TYPE TEXT;
+
+-- change column nullable
+ALTER TABLE tmdb_person ALTER COLUMN imdb_id DROP NOT NULL;
+
+-- describe table
+\d tablename
+
+-- add index
+CREATE INDEX tmdb_movie_cast_tmdb_movie_id_idx 
+ON tmdb_movie_cast(tmdb_movie_id);
+
+-- drop index
+DROP INDEX user_id_idx;
+DROP INDEX tmdb_movie_id_idx;
+
+-- list all indices
+SELECT
+    tablename,
+    indexname,
+    indexdef
+FROM
+    pg_indexes
+WHERE
+    schemaname = 'public'
+ORDER BY
+    tablename,
+    indexname;
+
+-- list indices of a table
+SELECT
+    indexname,
+    indexdef
+FROM
+    pg_indexes
+WHERE
+    tablename = 'table_name';
+
 -- runtime
 EXPLAIN ANALYZE
 -- query here

@@ -24,6 +24,9 @@ CREATE TABLE IF NOT EXISTS library_movie (
   FOREIGN KEY (library_category_id)     REFERENCES library_category(id)
 );
 
--- create index for tmdb_movie_id
-CREATE INDEX user_id_idx 
+-- create index for user_id
+CREATE INDEX 
 ON library_movie(user_id);
+
+-- CREATE INDEX library_movie_user_id_idx 
+-- ON library_movie(user_id);

@@ -23,8 +23,12 @@ router.get("/", async (req, res, next) => {
 
     // await myCoolFunction(movies, 0);
 
-    // for (let i = 0; i < movies.length; i++) {
-    for (let i = 240000; i < movies.length; i++) {
+    // await storeCredits(movies[0].id);
+
+    // await storeCredits(121);
+
+    for (let i = 0; i < movies.length; i++) {
+      // for (let i = 240000; i < movies.length; i++) {
       // for (let i = 252000; i < movies.length; i++) {
       console.log("i:", i);
       await storeMovie(movies[i].id);

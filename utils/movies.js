@@ -56,15 +56,17 @@ const toTitleCase = require("../utils/toTitleCase");
 //   }
 // };
 
+// obtain library fields to attach onto movie objects
 const getLibraryMovieData = async (tmdb_movie_id, user_id) => {
   const libraryMovie = await pool.query(
-    "SELECT library_category_id, score, watch_date, watch_count FROM library_movie WHERE user_id = $1 AND tmdb_movie_id = $2",
+    "SELECT library_category_id, score, watch_date, watch_count, private FROM library_movie WHERE user_id = $1 AND tmdb_movie_id = $2",
     [user_id, tmdb_movie_id]
   );
 
   return libraryMovie.rows[0];
 };
 
+// append library fields to given movie list for library user and authenticated user
 const appendLibraryMovieData = async (
   movies,
   authenticatedUserId,
@@ -78,6 +80,7 @@ const appendLibraryMovieData = async (
       score: null,
       watch_date: null,
       watch_count: null,
+      private: null,
     };
 
     if (authenticatedUserId) {
@@ -92,6 +95,7 @@ const appendLibraryMovieData = async (
         authenticatedUserLibraryData.score = libraryMovie.score;
         authenticatedUserLibraryData.watch_date = libraryMovie.watch_date;
         authenticatedUserLibraryData.watch_count = libraryMovie.watch_count;
+        authenticatedUserLibraryData.private = libraryMovie.private;
       }
     }
 
@@ -133,11 +137,20 @@ const appendLibraryMovieData = async (
 //   authenticatedUser: { id: ''},
 //   libraryUser: { id: ''},
 // };
+
+// FIX: filters and sort in library are going to change the origin, variable names, and expected results of these queries
 module.exports.getMovies = async function (options) {
+  // const options = {
+  //   query,
+  //   authenticatedUser,
+  //   libraryUser,
+  //   limit,
+  // };
   try {
     let response = null;
     let authenticatedUserId = null;
     let libraryUserId = null;
+    let limit = true;
 
     if (options.authenticatedUser) {
       authenticatedUserId = options.authenticatedUser.id;
@@ -145,6 +158,10 @@ module.exports.getMovies = async function (options) {
 
     if (options.libraryUser) {
       libraryUserId = options.libraryUser.id;
+    }
+
+    if (options.limit === "none") {
+      limit = false;
     }
 
     let queryParts = [];
@@ -156,7 +173,7 @@ module.exports.getMovies = async function (options) {
     // FROM
     queryParts.push("FROM tmdb_movie");
 
-    // If user LibraryUser exists and not empty, inner join on that user. FIX: update to attach authenticated user data and library user data as an object. should this JOIN be here regardless when trying to access a user's library?
+    // If user LibraryUser exists and not empty, inner join on that user.
     if (libraryUserId) {
       if (authenticatedUserId && authenticatedUserId === libraryUserId) {
         // if authenticated user is the library user, show all items
@@ -377,7 +394,9 @@ module.exports.getMovies = async function (options) {
       }
     };
 
-    parsePage();
+    if (limit) {
+      parsePage();
+    }
     // queryParts.push("LIMIT 20");
 
     console.log(" ");
@@ -398,6 +417,65 @@ module.exports.getMovies = async function (options) {
     );
 
     return finalMovies;
+  } catch (err) {
+    console.error(err.message);
+    // res.status(500).send("Server error");
+  }
+};
+
+// function to get library movie counts
+module.exports.getLibraryMovieCounts = async function (options) {
+  try {
+    let count = { all: 0, want: 0, watched: 0 };
+    let libraryUserId = null;
+
+    if (options.libraryUser) {
+      libraryUserId = options.libraryUser.id;
+    }
+
+    const countsResponse = await pool.query(
+      [
+        "SELECT library_category_id, COUNT(*)",
+        "FROM library_movie",
+        "WHERE user_id = $1",
+        "GROUP BY library_category_id",
+      ].join(" "),
+      [libraryUserId]
+    );
+
+    const counts = countsResponse.rows;
+
+    for (let i = 0; i < counts.length; i++) {
+      if (counts[i].library_category_id === 1) {
+        count.want = parseInt(counts[i].count);
+      } else if (counts[i].library_category_id === 3) {
+        count.watched = parseInt(counts[i].count);
+      }
+    }
+
+    count.all = count.want + count.watched;
+
+    return count;
+  } catch (err) {
+    console.error(err.message);
+    // res.status(500).send("Server error");
+  }
+};
+
+// Get details for a single movie
+module.exports.getMovie = async function (options) {
+  try {
+    // options = {
+    //   tmdb_movie_id,
+    //   authenticatedUser,
+    // };
+    // 0. check storage to see if it contains data for all tables
+    // 1. get tmdb_movie details
+    // 2. add on objects for tmdb_movie_cast, tmdb_movie_crew, and tmdb_movie_genres
+    // 3. add on object for authenticated library user data
+    // 4a. collapse tmdb_movie cast and crew so there aren't duplicates
+    // 4b. format genres and genre
+    // return movie;
   } catch (err) {
     console.error(err.message);
     // res.status(500).send("Server error");

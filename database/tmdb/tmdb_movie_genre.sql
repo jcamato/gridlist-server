@@ -10,7 +10,7 @@ updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (id)
 );
 
--- FIX: instead of hardcoding fetch endpoint https://api.themoviedb.org/3/genre/movie/list
+-- FIX: instead of hardcoding fetch endpoint https://api.themoviedb.org/3/genre/movie/list when initially building the live database
 INSERT INTO tmdb_movie_genre (id, name)
   VALUES
     (28, 'Action'),

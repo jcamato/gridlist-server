@@ -1,6 +1,8 @@
 const pool = require("../db");
 const fetch = require("node-fetch");
 
+const storeCredits = require("./storeCredits");
+
 module.exports = async function (id) {
   try {
     const stored_movie_appended = await pool.query(
@@ -8,9 +10,9 @@ module.exports = async function (id) {
         "SELECT distinct m.id, m.title",
         "FROM tmdb_movie AS m",
         "INNER JOIN tmdb_movie_genres AS g ON m.id = g.tmdb_movie_id",
+        "INNER JOIN tmdb_movie_crew AS cw ON m.id = cw.tmdb_movie_id",
         // "INNER JOIN tmdb_movie_videos AS v ON m.id = v.id",
         // "INNER JOIN tmdb_movie_images AS i ON m.id = i.id",
-        // "INNER JOIN tmdb_movie_credits AS c ON m.id = c.id",
         // "INNER JOIN tmdb_movie_keywords AS k ON m.id = k.id",
         "WHERE m.id = $1",
       ].join(" "),
@@ -21,35 +23,15 @@ module.exports = async function (id) {
 
     if (stored_movie_appended.rows.length > 0) {
       console.log("Movie and all related tables are already stored... ", id);
-
-      // if i want this middleware to also return the stored movie, i can use the following
-
-      // append objects to movie like TMDb response
-      // stored_movie.rows[0].videos = stored_videos.rows[0];
-      // stored_movie.rows[0].images = stored_images.rows[0];
-      // stored_movie.rows[0].credits = stored_credits.rows[0];
-
-      // res.locals.movieDidExist = true;
-      // res.locals.stored_movie_appended = stored_movie_appended;
     } else {
-      // res.locals.movieDidExist = false;
-      // if it isn't, fetch, send response, and store movie in database as well as videos, images, and credits
       const APP_KEY = process.env.TMDB_KEY;
 
       const fetchMovieAndStore = async () => {
-        // const response = await fetch(
-        //   `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}&append_to_response=videos,images,credits,keywords`
-        // );
         const response = await fetch(
           `https://api.themoviedb.org/3/movie/${id}?api_key=${APP_KEY}`
         );
         const movie = await response.json();
-        // res.json(movie);
 
-        // console.log(movie.genres);
-        // console.log(JSON.stringify(movie.genres));
-
-        // FIX: add condition to store appended tables. Currently if id exists, associate tables do too. Might not always be that way.
         if (!movie.id) {
           throw new Error("Movie not found");
         }
@@ -110,53 +92,8 @@ module.exports = async function (id) {
           }
         }
 
-        // if (movie.videos.results) {
-        //   const text_tmdb_movie_videos =
-        //     "INSERT INTO tmdb_movie_videos(id, results) VALUES($1, $2) ON CONFLICT ON CONSTRAINT tmdb_movie_videos_pkey DO NOTHING RETURNING *";
-
-        //   const values_tmdb_movie_videos = [
-        //     movie.id,
-        //     JSON.stringify(movie.videos.results),
-        //   ];
-        //   await pool.query(text_tmdb_movie_videos, values_tmdb_movie_videos);
-        // }
-
-        // if (movie.images.backdrops || movie.images.posters) {
-        //   const text_tmdb_movie_images =
-        //     "INSERT INTO tmdb_movie_images(id, backdrops, posters) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_images_pkey DO NOTHING RETURNING *";
-        //   const values_tmdb_movie_images = [
-        //     movie.id,
-        //     JSON.stringify(movie.images.backdrops),
-        //     JSON.stringify(movie.images.posters),
-        //   ];
-        //   await pool.query(text_tmdb_movie_images, values_tmdb_movie_images);
-        // }
-
         // credits
-        // if (movie.credits.cast || movie.credits.crew) {
-        //   const text_tmdb_movie_credits =
-        //     "INSERT INTO tmdb_movie_credits(id, cast_list, crew) VALUES($1, $2, $3) ON CONFLICT ON CONSTRAINT tmdb_movie_credits_pkey DO NOTHING RETURNING *";
-        //   const values_tmdb_movie_credits = [
-        //     movie.id,
-        //     JSON.stringify(movie.credits.cast),
-        //     JSON.stringify(movie.credits.crew),
-        //   ];
-        //   await pool.query(text_tmdb_movie_credits, values_tmdb_movie_credits);
-        // }
-
-        // if (movie.keywords.keywords) {
-        //   const text_tmdb_movie_keywords =
-        //     "INSERT INTO tmdb_movie_keywords(id, keywords) VALUES($1, $2) ON CONFLICT ON CONSTRAINT tmdb_movie_keywords_pkey DO NOTHING RETURNING *";
-
-        //   const values_tmdb_movie_keywords = [
-        //     movie.id,
-        //     JSON.stringify(movie.keywords.keywords),
-        //   ];
-        //   await pool.query(
-        //     text_tmdb_movie_keywords,
-        //     values_tmdb_movie_keywords
-        //   );
-        // }
+        await storeCredits(id);
 
         // console.log("Stored.");
       };

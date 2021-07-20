@@ -23,7 +23,7 @@ router.get("/", async (req, res, next) => {
 
     // await myCoolFunction(people, 0);
 
-    for (let i = 0; i < people.length; i++) {
+    for (let i = 90000; i < people.length; i++) {
       console.log("i:", i);
       await storePerson(people[i].id);
     }

@@ -16,5 +16,8 @@ FOREIGN KEY (tmdb_movie_genre_id)     REFERENCES tmdb_movie_genre(id)
 );
 
 -- create index for tmdb_movie_id
-CREATE INDEX tmdb_movie_id_idx 
+CREATE INDEX
 ON tmdb_movie_genres(tmdb_movie_id);
+
+-- CREATE INDEX tmdb_movie_genres_tmdb_movie_id_idx 
+-- ON tmdb_movie_genres(tmdb_movie_id);

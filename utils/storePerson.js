@@ -1,21 +1,21 @@
 const pool = require("../db");
 const fetch = require("node-fetch");
 
-module.exports = async function (id) {
+module.exports = async function (tmdb_person_id) {
   try {
     const stored_person = await pool.query(
       ["SELECT p.id", "FROM tmdb_person AS p", "WHERE p.id = $1"].join(" "),
-      [id]
+      [tmdb_person_id]
     );
 
     if (stored_person.rows.length > 0) {
-      console.log("Person already stored... ", id);
+      console.log("Person already stored... ", tmdb_person_id);
     } else {
       const APP_KEY = process.env.TMDB_KEY;
 
       const fetchPersonAndStore = async () => {
         const response = await fetch(
-          `https://api.themoviedb.org/3/person/${id}?api_key=${APP_KEY}`
+          `https://api.themoviedb.org/3/person/${tmdb_person_id}?api_key=${APP_KEY}`
         );
         const person = await response.json();
 
@@ -29,8 +29,11 @@ module.exports = async function (id) {
           person.name
         );
 
-        const text_tmdb_person =
-          "INSERT INTO tmdb_person(id, birthday, known_for_department, deathday, name, gender, biography, popularity, place_of_birth, profile_path, adult, imdb_id, homepage) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT ON CONSTRAINT tmdb_person_pkey DO NOTHING RETURNING *";
+        const text_tmdb_person = [
+          "INSERT INTO tmdb_person(id, birthday, known_for_department, deathday, name, gender, biography, popularity, place_of_birth, profile_path, adult, imdb_id, homepage)",
+          "VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+          "ON CONFLICT ON CONSTRAINT tmdb_person_pkey DO NOTHING RETURNING *",
+        ];
         const values_tmdb_person = [
           person.id,
           person.birthday,
@@ -46,7 +49,7 @@ module.exports = async function (id) {
           person.imdb_id,
           person.homepage,
         ];
-        await pool.query(text_tmdb_person, values_tmdb_person);
+        await pool.query(text_tmdb_person.join(" "), values_tmdb_person);
 
         // console.log("Stored.");
       };
